@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.member.MemberMapper">
+	
+	<resultMap type="MemberVO" id="memberResultMap">
+		<result property="member_email" column="member_email" />
+		<result property="member_password" column="member_password" />
+		<result property="member_admin" column="member_admin" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="member_picture" column="member_picture" />
+		<result property="member_area" column="member_area" />
+		<result property="member_country" column="member_country" />
+		<result property="member_makguli" column="member_makguli" />
+		<result property="member_place" column="member_place" />
+		<result property="member_date" column="member_date" />
+	</resultMap>
+	<!-- id는 MemberMapper.java에 동일하게 사용해야 한다 -->
+	
+	<select id="confirmEmail" parameterType="String" resultType="int">
+		select count(*) from member where member_email = #{email}
+	</select>
+	
+	<select id="confirmNickname" parameterType="String" resultType="int">
+		select count(*) from member where member_nickname = #{nickname}
+	</select>
+	
+	<insert id="insertMember" parameterType="com.spring.altaltal.member.MemberVO" >
+		insert into member(member_email, member_password, member_admin, member_nickname, 
+		<if test = "member_picture != '' ">
+		 member_picture, 
+		</if>
+		member_area, member_country, member_date) 
+		values (#{member_email}, #{member_password}, 0, #{member_nickname}, 
+		<if test = "member_picture != '' ">
+	   #{member_picture},
+	   </if> 
+	   #{member_area}, #{member_country}, sysdate)
+	</insert>
+	
+	<select id="userCheck" resultType="String">
+		select member_password from member where member_email=#{member_email}
+	</select>
+	
+	<select id="isAdmin" resultType="int">
+		select member_admin from member where member_email=#{member_email}
+	</select>
+	
+	<select id="getUserInfo" resultType="com.spring.altaltal.member.MemberVO">
+		select member_nickname, member_picture from member where member_email=#{member_email}
+	</select>
+	
+	<update id="updatePassword" parameterType="com.spring.altaltal.member.MemberVO">
+		update member set member_password=#{member_password} where member_email=#{member_email}
+	</update>
+	
+</mapper>

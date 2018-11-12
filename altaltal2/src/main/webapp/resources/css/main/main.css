@@ -1,0 +1,100 @@
+@charset "UTF-8";
+* {
+	box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+}
+html {
+	    position: relative;
+	    min-height: 100%;
+	    margin: 0;
+	}
+	
+    body {
+	    background-repeat: no-repeat;
+	    background-size: cover;
+	    background-attachment: fixed;
+	    margin: 0;
+	    padding: 0;
+	    min-height: 100%;
+	  }
+	  #contact_area{
+	  
+	  margin-bottom: 140px;
+	  height: 30%;
+	  }
+
+	.middle_contact { 
+	padding-top: 12px;
+	padding-bottom: 12px;
+	margin-left:-60px;
+	}
+	.jumbotron small {
+	color: #FFF;
+	}
+	.h1 small {
+	font-size: 18px;
+	}
+	.button {
+	background: #c82021;
+	color: #FFF;
+	border-radius: 3px;
+	}
+	.button.hover {
+	background: #c82021;
+	color: #358CCE;
+	}   
+	
+	.sections {
+                padding-top: 85px;
+                padding-bottom: 85px;
+                overflow: hidden;
+            }
+            .overlay {
+                background-color: white;
+                width: 100%;
+                height: 100%;
+            }
+            .counter_two{
+                background-size:cover;
+                height: 100%;
+                overflow: hidden;
+            }
+
+            .counter_two .main_counter_two .single_counter_two_right{
+                margin-top:30px;
+                overflow: hidden;
+                display: block;
+            }
+            .counter_two .main_counter_two .single_counter_two_right i{
+                color: black;
+                font-size:3.125rem;
+                margin-bottom:40px;
+                line-height: 4rem;
+                display: inline-block;
+            }
+            .counter_two .main_counter_two .single_counter_two_right h2{
+                color: black;
+                margin-bottom:30px;
+                line-height: 0;
+            }
+            .counter_two .main_counter_two .single_counter_two_right p{
+                color: black;
+            }
+
+            /* Landscape phones and portrait tablets */
+            @media  (max-width: 768px) {
+                html {
+                    font-size: 80%;
+                }
+
+                .counter_two {
+                    height: auto;
+                }
+                .overlay{
+                    height: auto;
+                }
+            }
+            .main_counter_two{
+            	height: 100%;
+            }

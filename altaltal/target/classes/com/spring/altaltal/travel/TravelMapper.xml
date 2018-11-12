@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.travel.TravelMapper">
+
+	<select id="courseList" parameterType="hashmap" resultType="com.spring.altaltal.travel.CourseVO">
+		select * from (select rownum rnum, course_num, course_area, course_name, course_content,
+		course_picture from (select * from course where course_area = #{course_area})) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountCourse" parameterType="String" resultType="int">
+		select count(*) from course where course_area = #{course_area}
+	</select>
+	
+	<select id="siteList" parameterType="hashmap" resultType="com.spring.altaltal.travel.SiteVO">
+		select * from travel_site where course_num in 
+		<foreach collection="numList" index="index" item="item" open="(" close=")" separator=",">
+	      #{item}
+	    </foreach>
+		 order by site_order
+	</select>
+	
+	<select id="siteListNum" parameterType="int" resultType="com.spring.altaltal.travel.SiteVO">
+		select * from travel_site where course_num =#{course_num} order by site_order
+	</select>
+
+</mapper>

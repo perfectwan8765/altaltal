@@ -1,0 +1,85 @@
+@charset "UTF-8";
+
+#registForm {
+	width: 400px;
+	height: 600px;
+	border: 1px solid red;
+	margin: auto;
+}
+
+h2 {
+	text-align: center;
+}
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
+  width: 80%;
+}
+.write {
+	-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background-color:#ffffff;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:6px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	cursor:pointer;
+	color:#666666;
+	font-family:Arial;
+	font-size:12px;
+	font-weight:bold;
+	text-decoration:none !important;<!-- important:강제로 지정하기 -->
+	text-shadow:0px 1px 0px #ffffff;
+}
+.write:hover {
+	background-color:#f6f6f6;
+}
+.write:active {
+	position:relative;
+	top:1px;
+}
+#pageList {
+	margin: auto;
+	width: 500px;
+	text-align: center;
+}
+
+.entryArea {
+	margin: auto;
+	width: 80%;
+	text-align: center;
+}
+
+.thead-line1 {
+	border-top: 1px solid #ccc;
+	border-bottom : 1px solid #ccc;
+}
+.table{
+	border-bottom : 1px solid #ccc;
+}
+.form-control {
+	width : 160px;
+}
+ .search {
+-moz-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	-webkit-box-shadow:inset 0px 1px 0px 0px #ffffff;
+	box-shadow:inset 0px 1px 0px 0px #ffffff;
+	background-color:#ffffff;
+	-moz-border-radius:6px;
+	-webkit-border-radius:6px;
+	border-radius:6px;
+	border:1px solid #dcdcdc;
+	display:inline-block;
+	cursor:pointer;
+
+	font-family:Arial;
+	font-size:12px;
+	font-weight:bold;
+	padding:5px 11px;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #ffffff;
+}

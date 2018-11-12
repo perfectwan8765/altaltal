@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.spring.altaltal.admin.AdminMapper">
+
+	<resultMap id="memberResultMap" type="MemberVO">
+		<result column="member_email" property="member_email"/>
+		<result column="member_password" property="member_password"/>
+		<result column="member_admin" property="member_admin"/>
+		<result column="member_nickname" property="member_nickname"/>
+		<result column="member_picture" property="member_picture"/>
+		<result column="member_area" property="member_area"/>
+		<result column="member_country" property="member_country"/>
+		<result column="member_date" property="member_date"/>
+	</resultMap>
+
+	<select id="membersList" parameterType="hashmap" resultType="com.spring.altaltal.member.MemberVO"> 
+		select * from (select rownum rnum, member_email, member_password, member_admin,
+		member_nickname, member_picture, member_area, member_country, member_date from (select
+		* from member where member_admin = 0
+		<if test = "topic.equals('email')" >
+		and member_email like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('nickname')" >
+		and member_nickname like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('area')" >
+		and member_area like '%'||#{keyword}||'%'
+		</if> 
+		<if test = "topic.equals('country')" >
+		and member_country like '%'||#{keyword}||'%'
+		</if>
+		)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountMember" parameterType="hashmap" resultType="int" >
+		select count(*) from member where member_admin = 0
+		<if test = "topic.equals('email')" >
+		and member_email like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('nickname')" >
+		and member_nickname like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('area')" >
+		and member_area like '%'||#{keyword}||'%'
+		</if> 
+		<if test = "topic.equals('country')" >
+		and member_country like '%'||#{keyword}||'%'
+		</if>
+	</select>
+	
+	<select id="adminMakguliList" parameterType="hashmap" resultType="com.spring.altaltal.makguli.MakguliVO"> 
+		select * from (select rownum rnum, makguli_num, makguli_name, makguli_area,
+		makguli_make, makguli_make_url, makguli_content, makguli_ingre, makguli_degree, makguli_likecount, 
+		makguli_readcount, makguli_picture from (select * from makguli 
+		<if test = "topic.equals('area')" >
+		 where makguli_area like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('product')" >
+		 where makguli_name like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('make')" >
+		 where makguli_make like '%'||#{keyword}||'%'
+		</if> 
+		<if test = "topic.equals('dosu')" >
+		 where makguli_degree like '%'||#{keyword}||'%'
+		</if>
+		order by makguli_num desc)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountMakguli" parameterType="hashmap" resultType="int" >
+		select count(*) from makguli
+		<if test = "topic.equals('area')" >
+		 where makguli_area like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('product')" >
+		 where makguli_name like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('make')" >
+		 where makguli_make like '%'||#{keyword}||'%'
+		</if> 
+		<if test = "topic.equals('dosu')" >
+		 where makguli_degree like '%'||#{keyword}||'%'
+		</if>
+	</select>
+	
+	<select id="getMaxMakguliNum" resultType="int" >
+		select nvl(max(makguli_num), 0) from makguli
+	</select>
+	
+	<insert id="insertMakguli" parameterType="com.spring.altaltal.makguli.MakguliVO" >
+		insert into makguli
+		<if test = "makguli_picture == '' ">
+		(makguli_num, makguli_name, makguli_area, makguli_make, makguli_make_url, makguli_content, makguli_ingre, makguli_degree, makguli_likecount, makguli_readcount) 
+		</if>
+		 values (#{makguli_num}, #{makguli_name}, #{makguli_area}, #{makguli_make}, #{makguli_make_url},
+		 #{makguli_content}, #{makguli_ingre}, #{makguli_degree}, 
+		<if test = "makguli_picture != '' ">
+	   #{makguli_picture},
+	   </if> 
+	   0, 0)
+	</insert>
+	
+	<select id="adminPlaceList" parameterType="hashmap" resultType="com.spring.altaltal.hotplace.HotplaceVO"> 
+		select * from (select rownum rnum, place_num, place_name, place_area,
+		place_juso, place_menu, place_phone, place_content, place_maplat, place_maplng, 
+		place_price, place_url, place_picture, place_likecount, place_readcount from 
+		(select * from hotplace 
+		<if test = "topic.equals('area')" >
+		 where place_area like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('place')" >
+		 where place_name like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('juso')" >
+		 where place_juso like '%'||#{keyword}||'%'
+		</if> 
+		<if test = "topic.equals('phone')" >
+		 where place_phone like '%'||#{keyword}||'%'
+		</if>
+		 order by place_num desc)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountPlace" parameterType="hashmap" resultType="int" >
+		select count(*) from hotplace
+		<if test = "topic.equals('area')" >
+		 where place_area like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('place')" >
+		 where place_name like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('juso')" >
+		 where place_juso like '%'||#{keyword}||'%'
+		</if> 
+		<if test = "topic.equals('phone')" >
+		 where place_phone like '%'||#{keyword}||'%'
+		</if>
+	</select>
+	
+	<select id="getMaxPlaceNum" resultType="int" >
+		select nvl(max(place_num), 0) from hotplace
+	</select>
+	
+	<insert id="insertPlace" parameterType="com.spring.altaltal.hotplace.HotplaceVO" >
+		insert into hotplace
+		<if test = "place_picture == '' ">
+		(place_num, place_name, place_area, place_juso, place_menu, place_phone, place_content, place_maplat, place_maplng, place_price, place_url, place_likecount, place_readcount) 
+		</if>
+		 values (#{place_num}, #{place_name}, #{place_area}, #{place_juso}, #{place_menu}, #{place_phone},
+		  #{place_content}, #{place_maplat}, #{place_maplng}, #{place_price}, #{place_url},
+		<if test = "place_picture != '' "> 
+	   #{place_picture},
+	   </if> 
+	   0, 0)
+	</insert>
+	
+	<select id="adminCourseList" parameterType="hashmap" resultType="com.spring.altaltal.travel.CourseVO"> 
+		select * from (select rownum rnum, course_num, course_area, course_name,
+		course_content, course_picture  from (select * from course 
+		<if test = "topic.equals('area')" >
+		 where course_area like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('name')" >
+		 where course_name like '%'||#{keyword}||'%'
+		</if>
+		 order by course_num desc)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountCourse" parameterType="hashmap" resultType="int" >
+		select count(*) from course
+		<if test = "topic.equals('area')" >
+		 where course_area like '%'||#{keyword}||'%'
+		</if>
+		<if test = "topic.equals('name')" >
+		 where course_name like '%'||#{keyword}||'%'
+		</if>
+	</select>
+	
+	<select id="getMaxSiteNum" resultType="int" >
+		select nvl(max(site_num), 0) from travel_site
+	</select>
+	
+	<select id="getMaxCourseNum" resultType="int" >
+		select nvl(max(course_num), 0) from course
+	</select>
+	
+	<insert id="insertCourse" parameterType="com.spring.altaltal.travel.CourseVO" >
+		insert into course
+		<if test = "course_picture == '' ">
+		(course_num, course_area, course_name, course_content) 
+		</if>
+		 values (#{course_num}, #{course_area}, #{course_name}, 
+		<if test = "course_picture != '' "> 
+	   #{course_picture},
+	   </if> 
+	   #{course_content})
+	</insert>
+	
+	<select id="getSiteList" parameterType= "int" resultType="com.spring.altaltal.travel.SiteVO" >
+		select * from travel_site where course_num = #{course_num} order by site_order
+	</select>
+	
+	<select id="getCourse" parameterType= "int" resultType="com.spring.altaltal.travel.CourseVO" >
+		select * from course where course_num = #{course_num}
+	</select>
+	
+	<insert id="insertSite" parameterType="com.spring.altaltal.travel.SiteVO" >
+		insert into travel_site
+		<if test = "site_picture == '' ">
+		(site_num, course_num, site_order, site_name, site_content, site_maplat, site_maplng) 
+		</if>
+		 values (#{site_num}, #{course_num}, #{site_order}, #{site_name},  #{site_content},
+		<if test = "site_picture != '' "> 
+	   #{site_picture},
+	   </if> 
+	   #{site_maplat}, #{site_maplng})
+	</insert>
+	
+	<select id="getSite" parameterType= "int" resultType="com.spring.altaltal.travel.SiteVO" >
+		select * from travel_site where site_num = #{site_num}
+	</select>
+	
+	<select id="getMakguli" parameterType= "int" resultType="com.spring.altaltal.makguli.MakguliVO" >
+		select * from makguli where makguli_num = #{makguli_num}
+	</select>
+	
+	<update id="updateMakguli" parameterType="com.spring.altaltal.makguli.MakguliVO" >
+		update makguli set makguli_area=#{makguli_area}, makguli_name=#{makguli_name}, 
+		 makguli_make=#{makguli_make}, makguli_make_url=#{makguli_make_url}, makguli_ingre=#{makguli_ingre}, makguli_degree=#{makguli_degree},
+		 makguli_content=#{makguli_content}, makguli_picture=#{makguli_picture} where makguli_num = #{makguli_num}
+	</update>
+	
+	<delete id="makguliDelete" parameterType="int" >
+		delete from makguli where makguli_num = #{makguli_num}
+	</delete>
+	
+	<select id="getPlace" parameterType= "int" resultType="com.spring.altaltal.hotplace.HotplaceVO" >
+		select * from hotplace where place_num = #{place_num}
+	</select>
+	
+	<update id="updatePlace" parameterType="com.spring.altaltal.hotplace.HotplaceVO" >
+		update hotplace set place_name=#{place_name}, place_area=#{place_area}, 
+		 place_juso=#{place_juso}, place_menu=#{place_menu}, place_phone=#{place_phone}, place_content=#{place_content},
+		 place_maplat=#{place_maplat}, place_maplng=#{place_maplng}, place_price=#{place_price}, 
+		 place_url=#{place_url}, place_picture=#{place_picture} where place_num = #{place_num}
+	</update>
+	
+	<delete id="deletePlace" parameterType="int" >
+		delete from hotplace where place_num = #{place_num}
+	</delete>
+	
+	<update id="updateSite" parameterType="com.spring.altaltal.travel.SiteVO" >
+		update travel_site set site_name=#{site_name}, site_order=#{site_order}, site_content=#{site_content}, 
+		 site_picture=#{site_picture}, site_maplat=#{site_maplat}, site_maplng=#{site_maplng}  where site_num = #{site_num}
+	</update>
+	
+	<delete id="siteDelete" parameterType="int" >
+		delete from travel_site where site_num = #{site_num}
+	</delete>
+	
+	<delete id="deleteCourse" parameterType="int" >
+		delete from course where course_num = #{course_num}
+	</delete>
+
+</mapper>

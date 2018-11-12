@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="BoardMapper">
+
+ 	<sql id="search">
+ 		<if test="topic != null">
+ 			<if test="topic== 'title'.toString()">
+ 				and title like CONCAT('%', #{keyword}, '%')
+ 			</if>
+ 			<if test="topic == 'content'.toString()">
+ 				and content like CONCAT('%', #{keyword}, '%')
+ 			</if>
+ 			<if test="topic == 'writer'.toString()">
+ 				and uname like CONCAT('%', #{keyword}, '%')
+ 			</if>
+ 		</if>
+ 	</sql>
+	
+	<select id="list" resultType="com.spring.board.domain.BoardVO">
+		<![CDATA[
+			select bno, uname, title, viewcnt, regdate from tbl_board 
+			where bno > 0 
+		]]>
+			
+		<include refid="search"></include>
+		
+		<![CDATA[
+			order by bno desc, regdate desc limit #{pageStart}, #{pageNum}
+		]]>
+	</select>
+	
+	<select id="view" resultType="com.spring.board.domain.BoardVO">
+		select * from tbl_board where bno = #{bno}
+	</select>
+	
+	<insert id="create">
+		insert into tbl_board(uname, title, content) values(#{uname}, #{title}, #{content})
+	</insert>
+	
+	<update id="update">
+		update tbl_board set title=#{title}, content=#{content}, updatedate=now() where bno=#{bno}
+	</update>
+	
+	<delete id="delete">
+		delete from tbl_board where bno=#{bno}
+	</delete>
+	
+	<select id="getTotal" resultType="int">
+		<![CDATA[
+		select count(bno) from tbl_board where bno > 0
+		]]>
+		<include refid="search"></include>
+	</select>
+	
+	<update id="countUp">
+		update tbl_board set viewcnt= viewcnt+1 where bno = #{bno}
+	</update>
+	
+</mapper>

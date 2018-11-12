@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.mypage.MypageMapper">
+
+    <resultMap type="MemberVO" id="memberResultMap">
+		<result property="member_email" column="member_email" />
+		<result property="member_password" column="member_password" />
+		<result property="member_admin" column="member_admin" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="member_picture" column="member_picture" />
+		<result property="member_area" column="member_area" />
+		<result property="member_country" column="member_country" />
+		<result property="member_date" column="member_date" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="makcommentMap">
+		<result property="mboard_num" column="mboard_num" />
+		<result property="makguli_num" column="makguli_num" />
+		<result property="makguli_name" column="makguli_name" />
+		<result property="makguli_area" column="makguli_area" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="mboard_content" column="mboard_content" />
+		<result property="mboard_sweat" column="mboard_sweat" />
+		<result property="mboard_sour" column="mboard_sour" />
+		<result property="mboard_body" column="mboard_body" />
+		<result property="mboard_spark" column="mboard_spark" />
+		<result property="mboard_popular" column="mboard_popular" />
+		<result property="mboard_date" column="mboard_date" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="placommentMap">
+		<result property="pboard_num" column="pboard_num" />
+		<result property="place_num" column="place_num" />
+		<result property="place_area" column="place_area" />
+		<result property="place_name" column="place_name" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="pboard_content" column="pboard_content" />
+		<result property="pboard_taste" column="pboard_taste" />
+		<result property="pboard_price" column="pboard_price" />
+		<result property="pboard_service" column="pboard_service" />
+		<result property="pboard_date" column="pboard_date" />
+	</resultMap>
+	
+	
+	<select id="getMember" parameterType="String" resultType="com.spring.altaltal.member.MemberVO">
+	   select * from member where member_email=#{email}
+	</select>
+	
+	<update id="updateMember" parameterType="com.spring.altaltal.member.MemberVO">
+	   update member set member_password=#{member_password}, member_nickname=#{member_nickname}, 
+	   <if test = "member_picture !='' ">
+	   member_picture=#{member_picture},
+	   </if>
+	   member_area=#{member_area}, member_country=#{member_country} where member_email=#{member_email}
+	</update>
+	
+	<delete id="deleteMember" parameterType="String">
+	   delete from member where member_email=#{email}
+	</delete>
+	
+	<select id="confirmNickname" parameterType="String" resultType="int">
+		select count(*) from member where member_nickname = #{nickname}
+	</select>
+	
+	<select id="getMemberBoardList" parameterType="hashmap" resultType="com.spring.altaltal.freeboard.FreeboardVO">
+		select * from (select rownum rnum, free_num, member_nickname, free_subject, free_content, free_readcount, free_ref, free_ref_seq, 
+		free_ref_level, free_date from (select * from free_board where free_ref_level = 0 and member_nickname = #{nickname} order by free_num desc))
+		where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountMemberBoard" parameterType="String" resultType="int" >
+		select count(*) from free_board where free_ref_level = 0 and member_nickname = #{nickname}
+	</select>
+	
+	<select id="getBoard" parameterType="int" resultType="com.spring.altaltal.freeboard.FreeboardVO" >
+		select * from free_board where free_num =#{free_num}
+	</select>
+	
+	<select id="getSearchArticles" parameterType="hashmap" resultType="com.spring.altaltal.freeboard.FreeboardVO" >
+		select * from (select rownum rnum, free_num, member_nickname,
+		free_subject, free_content, free_readcount, free_ref, free_ref_seq,
+		free_ref_level, free_date from (select * from free_board where free_ref_level = 0 and member_nickname = #{nickname}
+		<if test = "topic.equals('title')" >
+		and free_subject like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('content')" >
+		and free_content like '%'||#{keyword}||'%' 
+		</if>
+		order by free_num desc))
+		where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountSearchArticle" parameterType="hashmap" resultType="int" >
+		select count(*) from free_board where free_ref_level = 0 and member_nickname = #{nickname}
+		<if test = "topic.equals('title')" >
+		and free_subject like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('content')" >
+		and free_content like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	
+	<select id="getMakguliList" parameterType="String" resultType="String" >
+		select nvl(member_makguli, 'not') from member where member_email = #{email}
+	</select>
+	
+	<select id="mypageMakguliList" parameterType="hashmap" resultType="com.spring.altaltal.makguli.MakguliVO" >
+		select * from (select rownum rnum, makguli_num, makguli_name, makguli_area, makguli_make,
+		makguli_make_url, makguli_content, makguli_ingre, makguli_degree, 
+		 makguli_likecount, makguli_readcount, makguli_picture 
+		 from (select * from makguli where makguli_num in 
+		<foreach collection="likeList" item="item" open="(" close=")" separator=",">
+	      #{item}
+	    </foreach>
+		<if test = "topic.equals('area')" >
+		and makguli_area like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('name')" >
+		and makguli_name like '%'||#{keyword}||'%' 
+		</if>
+		 order by makguli_num desc))
+		 where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountMyMakguli" parameterType="hashmap" resultType="int" >
+		select count(*) from makguli where makguli_num in 
+		<foreach collection="likeList" item="item" open="(" close=")" separator=",">
+	      #{item}
+	    </foreach>
+		<if test = "topic.equals('area')" >
+		and makguli_area like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('name')" >
+		and makguli_name like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	
+	<select id="getPlaceList" parameterType="String" resultType="String" >
+		select nvl(member_place, 'not') from member where member_email = #{email}
+	</select>
+	
+	<select id="mypagePlaceList" parameterType="hashmap" resultType="com.spring.altaltal.hotplace.HotplaceVO" >
+		select * from (select rownum rnum, place_num, place_name, place_area, place_juso, place_menu, 
+		place_phone, place_content, place_maplat, place_maplng, place_price, place_url,
+		 place_picture, place_likecount, place_readcount 
+		 from (select * from hotplace where place_num in 
+		<foreach collection="likeList" item="item" open="(" close=")" separator=",">
+	      #{item}
+	    </foreach>
+		<if test = "topic.equals('area')" >
+		and place_area like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('name')" >
+		and place_num like '%'||#{keyword}||'%' 
+		</if>
+		 order by place_num desc))
+		 where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountMyPlace" parameterType="hashmap" resultType="int" >
+		select count(*) from hotplace where place_num in 
+		<foreach collection="likeList" item="item" open="(" close=")" separator=",">
+	      #{item}
+	    </foreach>
+		<if test = "topic.equals('area')" >
+		and place_area like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('name')" >
+		and place_num like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	
+	<select id="myMakguliCommentList" parameterType="hashmap" resultMap="makcommentMap" >
+		select * from (select rownum rnum, mboard_num, makguli_num, member_nickname, makguli_name, 
+		makguli_area, mboard_content, mboard_sweat, mboard_sour, mboard_body, mboard_spark,
+		mboard_popular, mboard_date from (select b.mboard_num, b.makguli_num, m.makguli_name, m.makguli_area, 
+		b.member_nickname, b.mboard_content, b.mboard_sweat, b.mboard_sour, b.mboard_body, b.mboard_spark, 
+		b.mboard_popular, b.mboard_date from makguli m, makguli_board b 
+		where m.makguli_num=b.makguli_num and member_nickname = #{nickname}
+		<if test = "topic.equals('name')" >
+		and makguli_name like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('area')" >
+		and makguli_area like '%'||#{keyword}||'%' 
+		</if>
+		order by mboard_num desc))
+		where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountCommntMakguli" parameterType="hashmap" resultType="int" >
+		select count(*) from makguli m, makguli_board b 
+		where m.makguli_num=b.makguli_num and member_nickname = #{nickname}
+		<if test = "topic.equals('name')" >
+		and makguli_name like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('area')" >
+		and makguli_area like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	
+	<select id="myPlaceCommentList" parameterType="hashmap" resultMap="placommentMap" >
+		select * from (select rownum rnum, pboard_num, place_num, member_nickname, place_name, 
+		place_area, pboard_content, pboard_taste, pboard_price, pboard_service, pboard_date from 
+		 (select b.pboard_num, b.place_num, h.place_name, h.place_area, 
+		b.member_nickname, b.pboard_content, b.pboard_taste, b.pboard_price, b.pboard_service, b.pboard_date 
+		from hotplace h, hotplace_board b where h.place_num=b.place_num and member_nickname = #{nickname}
+		<if test = "topic.equals('name')" >
+		and place_name like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('area')" >
+		and place_area like '%'||#{keyword}||'%' 
+		</if>
+		order by pboard_num desc))
+		where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountCommntPlace" parameterType="hashmap" resultType="int" >
+		select count(*) from hotplace h, hotplace_board b 
+		where h.place_num=b.place_num and member_nickname = #{nickname}
+		<if test = "topic.equals('name')" >
+		and place_name like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('area')" >
+		and place_area like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	
+</mapper>

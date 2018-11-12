@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="UserMapper">
+	
+	<select id="checkEmail" resultType="int">
+		select count(*) from tbl_user where email = #{email}
+	</select>
+	
+	<select id="checkPass" resultType="int">
+		select count(*) from tbl_user where email = #{email} and upw=#{upw}
+	</select>
+	
+	<select id="checkUname" resultType="int">
+		select count(*) from tbl_user where uname = #{uname}
+	</select>
+	
+	<insert id="join">
+		insert into tbl_user(email, upw, uname, 
+		<if test ="profile != null ">
+		 profile, 
+		</if>
+		area, country) 
+		values (#{email}, #{upw}, #{uname}, 
+		<if test ="profile != null ">
+	   #{profile},
+	   </if> 
+	   #{area}, #{country})
+	</insert>
+	
+	<select id="login" resultType="com.spring.user.domain.UserVO">
+		select email, upw, uname, adminck, profile from tbl_user where email=#{email} and upw=#{upw}
+	</select>
+	
+	<update id="changePW">
+		update tbl_user set upw=#{upw} where email=#{email}
+	</update>
+	
+	<update id="keepLogin">
+		update tbl_user set sessionkey=#{sessionkey}, sessiondate=#{sessiondate} 
+		where email = #{email}
+	</update>
+	
+	<select id="checkAutoLogin" resultType="com.spring.user.domain.UserVO">
+		select * from tbl_user where sessionkey = #{sessionkey} and sessiondate > now()
+	</select>
+	
+</mapper>

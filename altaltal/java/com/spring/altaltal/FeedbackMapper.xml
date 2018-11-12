@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+
+<mapper namespace="com.spring.altaltal.FeedbackMapper">
+	
+	<insert id="insertFeedback" parameterType="FeedbackVO" >
+		insert into feedback values(#{feedback_num}, #{feedback_writer}, #{feedback_email}, 
+		#{feedback_message}, '대기', sysdate)
+	</insert>
+	
+	<select id="getMaxFeedbackNum" resultType="int" >
+		select nvl(max(feedback_num), 0) from feedback
+	</select>	
+	
+	<select id="getFeedbackList" parameterType="hashmap" resultType="com.spring.altaltal.FeedbackVO" >
+		select * from (select rownum rnum, feedback_num, feedback_writer, 
+		feedback_email, feedback_message, feedback_status, feedback_date  
+		from (select * from feedback order by feedback_num desc)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountFeedback" resultType="int" >
+		select count(*) from feedback
+	</select>	
+	
+	<select id="getFeedback" parameterType="int" resultType="com.spring.altaltal.FeedbackVO" >
+		select * from feedback where feedback_num =#{feedback_num}
+	</select>	
+	
+	<update id="updateFeedback" parameterType="hashmap" >
+		update feedback set
+		<if test = "status.equals('wait')" >
+		feedback_status = '대기'   
+		</if>
+		<if test = "status.equals('read')" >
+		feedback_status = '읽음'   
+		</if>
+		<if test = "status.equals('response')" >
+		feedback_status = '응답완료'    
+		</if>
+		 where feedback_num =#{feedback_num}
+	</update>
+	
+	<delete id="deleteFeedback" parameterType="int" >
+		delete from feedback where feedback_num =#{feedback_num}
+	</delete>
+
+</mapper>

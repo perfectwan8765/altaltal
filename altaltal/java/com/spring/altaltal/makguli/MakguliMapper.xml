@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.makguli.MakguliMapper">
+	
+	<resultMap type="MakguliVO" id="makguliResultMap">
+		<result property="makguli_num" column="makguli_num" />
+		<result property="makguli_name" column="makguli_name" />
+		<result property="makguli_area" column="makguli_area" />
+		<result property="makguli_make" column="makguli_make" />
+		<result property="makguli_make_url" column="makguli_make_url" />
+		<result property="makguli_content" column="makguli_content" />
+		<result property="makguli_ingre" column="makguli_ingre" />
+		<result property="makguli_degree" column="makguli_degree" />
+		<result property="makguli_likecount" column="makguli_likecount" />
+		<result property="makguli_readcount" column="makguli_readcount" />
+		<result property="makguli_picture" column="makguli_picture" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="commentMap">
+		<result property="mboard_num" column="mboard_num" />
+		<result property="makguli_num" column="makguli_num" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="member_picture" column="member_picture" />
+		<result property="mboard_content" column="mboard_content" />
+		<result property="mboard_sweat" column="mboard_sweat" />
+		<result property="mboard_sour" column="mboard_sour" />
+		<result property="mboard_body" column="mboard_body" />
+		<result property="mboard_spark" column="mboard_spark" />
+		<result property="mboard_popular" column="mboard_popular" />
+		<result property="mboard_date" column="mboard_date" />
+	</resultMap>
+
+	<select id="getMakguliList" parameterType="hashmap" resultType="com.spring.altaltal.makguli.MakguliVO" >
+		select * from (select rownum rnum, makguli_num, makguli_name, makguli_area,
+		makguli_make, makguli_make_url, makguli_content, makguli_ingre, makguli_degree,
+		 makguli_likecount, makguli_readcount, makguli_picture from (select * from makguli where makguli_area = #{makguli_area}	
+		<if test = "keyword.equals('like')" >
+		 order by makguli_likecount desc
+		</if>
+		<if test = "keyword.equals('read')" >
+		order by makguli_readcount desc
+		</if>
+		<if test = "keyword.equals('abc')" >
+		order by makguli_name
+		</if>
+		 ))where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+		
+	</select>
+	
+	<select id="getCountMakguli" parameterType="String" resultType="int" >
+		select count(*) from makguli where makguli_area = #{makguli_area}	
+	</select>
+	
+	<update id="upCountMakguli" parameterType="int" >
+		update makguli set makguli_readcount = makguli_readcount +1 where makguli_num = #{makguli_num}	 
+	</update>
+	
+	<select id="getMakguli" parameterType="int" resultType="com.spring.altaltal.makguli.MakguliVO" >
+		select * from makguli where makguli_num = #{makguli_num}	
+	</select>
+	
+	<select id="getCommentList" parameterType="hashmap" resultMap="commentMap" >
+		select * from (select rownum rnum, mboard_num, makguli_num, member_nickname, member_picture, 
+		mboard_content, mboard_sweat, mboard_sour, mboard_body, mboard_spark, mboard_popular, mboard_date  
+		from (select b.mboard_num, b.makguli_num, b.member_nickname, m.member_picture, b.mboard_content,
+		 b.mboard_sweat, b.mboard_sour, b.mboard_body, b.mboard_spark, b.mboard_popular, b.mboard_date 
+		 from makguli_board b, member m where b.member_nickname = m.member_nickname 
+		 and makguli_num = #{makguli_num} order by mboard_num desc)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountComment" parameterType="int" resultType="int" >
+		select count(*) from makguli_board where makguli_num = #{makguli_num}
+	</select>
+	
+	<select id="getCountMaxComment" resultType="int" >
+		select nvl(max(mboard_num), 0) from makguli_board
+	</select>
+	
+	<insert id="insertMakguliComment" parameterType="com.spring.altaltal.makguli.MakguliboardVO" >
+		insert into makguli_board values(#{mboard_num}, #{makguli_num}, #{member_nickname}, #{mboard_content},
+		 #{mboard_sweat}, #{mboard_sour}, #{mboard_body}, #{mboard_spark}, #{mboard_popular}, sysdate)
+	</insert>
+	
+	<select id="getUserLikes" parameterType="String" resultType="String" >
+		select nvl(member_makguli, 'not') from member where member_email = #{member_email}
+	</select>
+	
+	<update id="updateUserLike" parameterType="hashmap" >
+		update member set member_makguli = #{member_makguli} where member_email =#{member_email}
+	</update>
+	
+	<update id="upLikeCount" parameterType="int" >
+		update makguli set makguli_likecount = makguli_likecount+1 where makguli_num =#{makguli_num}
+	</update>
+	
+	<update id="downLikeCount" parameterType="int" >
+		update makguli set makguli_likecount = makguli_likecount-1 where makguli_num =#{makguli_num}
+	</update>
+	
+	<select id="getMaguliLike" parameterType="int" resultType="int" >
+		select makguli_likecount from makguli where makguli_num =#{makguli_num}
+	</select>
+	
+	<update id="updateMakguliComment" parameterType="com.spring.altaltal.makguli.MakguliboardVO" >
+		update makguli_board set mboard_content = #{mboard_content}, mboard_sweat = #{mboard_sweat},
+		 mboard_sour = #{mboard_sour}, mboard_body = #{mboard_body}, mboard_spark = #{mboard_spark}, mboard_popular = #{mboard_popular}
+		 where mboard_num = #{mboard_num}
+	</update>
+	
+	<delete id="deleteMakguliComment" parameterType="com.spring.altaltal.makguli.MakguliboardVO" >
+		delete from makguli_board where mboard_num = #{mboard_num} 
+	</delete>
+	
+</mapper>

@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.freeboard.FreeboardMapper">
+	
+	<resultMap type="FreeboardVO" id="freeboardResultMap">
+		<result property="free_num" column="free_num" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="free_subject" column="free_subject" />
+		<result property="free_content" column="free_content" />
+		<result property="free_readcount" column="free_readcount" />
+		<result property="free_ref" column="free_ref" />
+		<result property="free_ref_seq" column="free_ref_seq" />
+		<result property="free_ref_level" column="free_ref_level" />
+		<result property="free_date" column="free_date" />
+	</resultMap>
+	
+	<resultMap type="MemberVO" id="memberResultMap">
+		<result property="member_picture" column="member_picture" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="commentMap">
+		<result property="free_num" column="free_num" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="free_subject" column="free_subject" />
+		<result property="free_content" column="free_content" />
+		<result property="free_readcount" column="free_readcount" />
+		<result property="free_ref" column="free_ref" />
+		<result property="free_ref_seq" column="free_ref_seq" />
+		<result property="free_ref_level" column="free_ref_level" />
+		<result property="free_date" column="free_date" />
+		<result property="member_picture" column="member_picture" />
+	</resultMap>
+	
+	<!-- id는 MemberMapper.java에 동일하게 사용해야 한다 -->
+	<!-- 원글만 불러오기 -->
+	<select id="getMainBoardList" parameterType="hashmap" resultMap="freeboardResultMap" >
+		select * from (select rownum rnum, free_num, member_nickname,
+		free_subject, free_content, free_readcount, free_ref, free_ref_seq,
+		free_ref_level, free_date from (select * from free_board where free_ref_level = 0
+		<if test = "topic.equals('title')" >
+		and free_subject like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('content')" >
+		and free_content like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('writer')" >
+		and member_nickname like '%'||#{keyword}||'%' 
+		</if> 
+		order by free_num desc))
+		 where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<!-- 원글만 카운트하기 -->
+	<select id="getCountMainBoard" parameterType="hashmap" resultType="int" >
+		select count(*) from free_board where free_ref_level = 0
+		<if test = "topic.equals('title')" >
+		and free_subject like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('content')" >
+		and free_content like '%'||#{keyword}||'%' 
+		</if>
+		<if test = "topic.equals('writer')" >
+		and member_nickname like '%'||#{keyword}||'%' 
+		</if>
+	</select>
+	
+	<!-- 해당글의 댓글들 불러오기 -->
+	<select id="getReplyBoardList" parameterType="int" resultMap="commentMap" >
+		select f.free_num, m.member_nickname, f.free_subject, f.free_content, f.free_readcount, f.free_ref, 
+		f.free_ref_seq, f.free_ref_level, f.free_date, m.member_picture from free_board f, member m
+		where f.MEMBER_NICKNAME = m.MEMBER_NICKNAME and f.free_ref = #{free_num} and
+		f.free_ref_level not in(0) order by f.free_ref_seq asc
+	</select>
+	
+	<select id="getCountReplyBoard" parameterType="int" resultType="int" >
+		select count(*) from free_board where free_ref_level not in(0) and free_ref =#{free_num} 
+	</select>
+	
+	<select id="getBoard" parameterType="int" resultMap="freeboardResultMap" >
+		select * from free_board where free_num =#{free_num} 
+	</select>
+	
+	<select id="getMaxNumBoard" resultType="int" >
+		select nvl(max(free_num), 0) from free_board
+	</select>
+	
+	<insert	id="insertBoard" parameterType="com.spring.altaltal.freeboard.FreeboardVO" >
+		insert into free_board(free_num, member_nickname,
+		<if test = "free_subject != null ">
+		  free_subject,
+		</if>
+		  free_content, free_readcount, free_ref, free_ref_seq, free_ref_level, free_date) values(#{free_num}, #{member_nickname}, 
+		<if test = "free_subject != null ">
+		  #{free_subject},
+		</if>
+		  #{free_content}, 0, #{free_ref}, #{free_ref_seq}, #{free_ref_level}, sysdate)
+	</insert>
+	
+	<update id="insertReply" parameterType="hashmap" >
+		update free_board set free_ref_seq=free_ref_seq +1 where free_ref=#{free_ref} and free_ref_seq &gt;#{free_ref_seq}
+	</update>
+	
+	<update id="updateBoard" parameterType="com.spring.altaltal.freeboard.FreeboardVO" >
+		update free_board set free_subject=#{free_subject}, free_content=#{free_content} where free_num=#{free_num}
+	</update>
+	
+	<delete id="deleteArticle" parameterType="com.spring.altaltal.freeboard.FreeboardVO" >
+		delete from free_board where free_ref=#{free_num} 
+	</delete>
+	
+	<delete id="deleteComment" parameterType="com.spring.altaltal.freeboard.FreeboardVO" >
+		delete from free_board where free_num=#{free_num} 
+	</delete>
+	
+	<update id="upReadCountBoard" parameterType="int" >
+		update free_board set free_readcount= free_readcount+1 where free_num=#{free_num}
+	</update>
+	
+	<update id="updateComment" parameterType="com.spring.altaltal.freeboard.FreeboardVO" >
+		update free_board set free_content=#{free_content} where free_num=#{free_num}
+	</update>
+	
+</mapper>

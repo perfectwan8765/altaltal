@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.visitor.VisitorMapper">
+
+	<insert id="insertVisitor" parameterType="String" >
+		insert into visitor_count values(visitor_count_seq.nextval, #{agent}, sysdate)
+	</insert>
+	
+	<select id="getMaxNum" resultType="int" >
+		select nvl(max(visitor_num), 0) from visitor_count
+	</select>
+	
+	<select id="getCountMember" resultType="int" >
+		select count(*) from member where member_admin = 0
+	</select>
+	
+	<select id="getLikeMakguli" resultType="int" >
+		select nvl(sum(makguli_likecount), 0) from makguli
+	</select>
+	
+	<select id="getLikePlace" resultType="int" >
+		select nvl(sum(place_likecount), 0) from hotplace
+	</select>
+	
+	<select id="getCountMakguli" resultType="int" >
+		select count(*) from makguli
+	</select>
+	
+	<select id="getCountPlace" resultType="int" >
+		select count(*) from hotplace
+	</select>
+	
+	<select id="getCountSite" resultType="int" >
+		select count(*) from travel_site
+	</select>
+	
+	<select id="getCountCourse" resultType="int" >
+		select count(*) from course
+	</select>
+	
+</mapper>	

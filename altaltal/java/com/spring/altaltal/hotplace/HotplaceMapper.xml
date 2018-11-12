@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+	
+<mapper namespace="com.spring.altaltal.hotplace.HotplaceMapper">
+	
+	<resultMap type="HotplaceVO" id="hotplaceResultMap">
+		<result property="place_num" column="place_num" />
+		<result property="place_name" column="place_name" />
+		<result property="place_area" column="place_area" />
+		<result property="place_juso" column="place_juso" />
+		<result property="place_menu" column="place_menu" />
+		<result property="place_phone" column="place_phone" />
+		<result property="place_content" column="place_content" />
+		<result property="place_maplng" column="place_maplng" />
+		<result property="place_maplat" column="place_maplat" />
+		<result property="place_picture" column="place_picture" />
+		<result property="place_price" column="place_price" />
+		<result property="place_url" column="place_url" />
+		<result property="place_likecount" column="place_likecount" />
+		<result property="place_readcount" column="place_readcount" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="avgMap">
+		<result property="pboard_taste" column="pboard_taste" />
+		<result property="pboard_price" column="pboard_price" />
+		<result property="pboard_service" column="pboard_service" />
+	</resultMap>
+	
+	<resultMap type="java.util.HashMap" id="commentMap">
+		<result property="pboard_num" column="pboard_num" />
+		<result property="place_num" column="place_num" />
+		<result property="member_nickname" column="member_nickname" />
+		<result property="member_picture" column="member_picture" />
+		<result property="pboard_content" column="pboard_content" />
+		<result property="pboard_taste" column="pboard_taste" />
+		<result property="pboard_price" column="pboard_price" />
+		<result property="pboard_service" column="pboard_service" />
+		<result property="pboard_date" column="pboard_date" />
+	</resultMap>
+	
+	<select id="getPlaceList" parameterType="hashmap" resultMap="hotplaceResultMap" >
+		select * from (select rownum rnum, place_num, place_name, place_area, place_juso, 
+		place_menu, place_phone, place_content, place_maplat, place_maplng, place_price, 
+		place_url, place_picture, place_likecount, place_readcount 
+	 from (select * from hotplace where place_area = #{place_area}	
+		<if test = "keyword.equals('like')" >
+		 order by place_likecount desc
+		</if>
+		<if test = "keyword.equals('abc')" >
+		 order by place_name
+		</if>
+		<if test = "keyword.equals('read')" >
+		 order by place_readcount desc
+		</if>
+		)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+	
+	<select id="getCountHotplace" parameterType="String" resultType="int" >
+		select count(*) from hotplace where place_area = #{place_area}	
+	</select>
+	
+	<update id="upCountPlace" parameterType="int" >
+		update hotplace set place_readcount = place_readcount +1 where place_num = #{place_num}	 
+	</update>
+	
+	<select id="getPlace" parameterType="int" resultType="com.spring.altaltal.hotplace.HotplaceVO" >
+		select * from hotplace where place_num = #{place_num}	
+	</select>
+	
+	<select id="getCountComment" parameterType="int" resultType="int" >
+		select count(*) from hotplace_board where place_num = #{place_num}
+	</select>
+	
+	<select id="getCommentList" parameterType="int" resultMap="commentMap" >
+		select * from (select rownum rnum, pboard_num, place_num, member_nickname, member_picture, 
+		pboard_content, pboard_taste, pboard_price, pboard_service, pboard_date 
+		from (select h.pboard_num, h.place_num, h.member_nickname, m.member_picture, h.pboard_content,
+		 h.pboard_taste, h.pboard_price, h.pboard_service, h.pboard_date 
+		 from hotplace_board h, member m where h.member_nickname = m.member_nickname 
+		and place_num = #{place_num} order by pboard_num desc)) where rnum&gt;=#{startrow} and rnum&lt;=#{endrow}
+	</select>
+
+	<select id="getCountMaxComment" resultType="int" >
+		select nvl(max(pboard_num), 0) from hotplace_board
+	</select>
+	
+	<insert id="insertPlaceComment" parameterType="com.spring.altaltal.hotplace.PlaceboardVO" >
+		insert into hotplace_board values(#{pboard_num}, #{place_num}, #{member_nickname}, #{pboard_content},
+		 #{pboard_taste}, #{pboard_price}, #{pboard_service}, sysdate)
+	</insert>
+	
+	<delete id="deletePlaceComment" parameterType="int" >
+		delete from hotplace_board where pboard_num = #{pboard_num}
+	</delete>
+	
+	<update id="updatePlaceComment" parameterType="com.spring.altaltal.hotplace.PlaceboardVO" >
+		update hotplace_board set pboard_content = #{pboard_content}, pboard_taste = #{pboard_taste},
+		 pboard_price = #{pboard_price}, pboard_service = #{pboard_service} where pboard_num = #{pboard_num}
+	</update>
+	
+	<select id="likecheck" parameterType="String" resultType="String" >
+		select member_place from member where member_email = #{member_email}
+	</select>
+	
+	<select id="getLikeCount" parameterType="int" resultType="int" >
+		select place_likecount from hotplace where place_num = #{place_num}
+	</select>
+	
+	<select id="memberLikeUp" parameterType="hashmap" resultType="int" >
+		update member set member_place = #{userLike} where member_email = #{member_email}
+	</select>
+	
+	<select id="evaluatePlace" parameterType="int" resultMap="avgMap" >
+		select avg(pboard_taste), avg(pboard_price), avg(pboard_service) from hotplace_board where place_num = #{place_num}
+	</select>
+	
+	<select id="getPlaceUrl" parameterType="int" resultType="String" >
+		select place_url from hotplace where place_num = #{place_num}
+	</select>
+	
+	<select id="getPlaceLikes" parameterType="String" resultType="String" >
+		select nvl(member_place, 'not') from member where member_email = #{member_email}
+	</select>
+	
+	<update id="updatePlaceLike" parameterType="hashmap" >
+		update member set member_place=#{member_place} where member_email =#{member_email}
+	</update>
+	
+	<update id="upPlaceLikeCount" parameterType="int" >
+		update hotplace set place_likecount= place_likecount+1 where place_num =#{place_num}
+	</update>
+	
+	<update id="downPlaceLikeCount" parameterType="int" >
+		update hotplace set place_likecount= place_likecount-1 where place_num =#{place_num}
+	</update>
+	
+	<select id="getPlaceLike" parameterType="int" resultType="int" >
+		select place_likecount from hotplace where place_num =#{place_num}
+	</select>
+	
+</mapper>
