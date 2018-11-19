@@ -59,7 +59,10 @@ public class AuthInterceptor extends HandlerInterceptorAdapter{
 						return true;
 					}
 				}
-				response.sendRedirect("/user/login");
+			
+				String old_url = request.getHeader("referer").substring(21);
+				response.sendRedirect(old_url);
+				
 				return false;
 			}
 			

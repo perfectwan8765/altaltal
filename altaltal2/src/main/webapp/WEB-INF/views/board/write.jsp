@@ -18,7 +18,7 @@
  		<tbody>
          	<tr>
             	<th scope="row">글쓴이 </th>
-           		<td><input type="text" name="uname" value="uname" readonly/></td>
+           		<td><input type="text" name="uname" value="${login.uname }" readonly/></td>
            </tr>
          	<tr>
             	<th scope="row">제목</th>

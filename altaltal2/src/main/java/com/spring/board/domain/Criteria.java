@@ -25,6 +25,7 @@ public class Criteria {
 			this.pageNum = 10;
 			return;
 		}
+		this.pageNum = pageNum;
 	}
 	
 	public int getPage() {
