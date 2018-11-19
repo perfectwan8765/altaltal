@@ -3,7 +3,7 @@ Altaltal Project - 막걸리콘텐츠를 활용한 사용자참여형 커뮤티�
 
 # version_1
 Period : 18/07/05 ~ 18/08/31 </br>
-Language : Java, JSP, HTML5, CSS3, JavaScript, Oracle, Spring, JQuery, Bootstrap, GoogleMap API
+Language : Java, JSP, HTML5, CSS3, JavaScript, Oracle, Spring, JQuery, Bootstrap, GoogleMap API </br>
 Function
 1) 회원시스템 : 가입 / 정보수정 / 탈퇴 / 마이페이지
 2) 게시판운영 : 키워드검색 / 댓글(Ajax 활용) / 게시자 프로필 사진 출력
@@ -14,7 +14,7 @@ Function
  
 # version_2
 Period : 18/10/20 ~ </br>
-Update
+Update </br>
 1) DB : Oracle -> MySQL
 2) JSTL 활용
 3) Handlebars.js 활용
