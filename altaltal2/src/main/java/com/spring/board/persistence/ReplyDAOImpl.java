@@ -30,4 +30,14 @@ public class ReplyDAOImpl implements ReplyDAO{
 	public void create(ReplyVO vo) throws Exception{
 		session.insert("ReplyMapper.create", vo);
 	}
+	
+	@Override
+	public void modify(ReplyVO vo) throws Exception{
+		session.update("ReplyMapper.modify", vo);
+	}
+	
+	@Override
+	public void delete(int rno) throws Exception{
+		session.delete("ReplyMapper.delete", rno);
+	}
 }

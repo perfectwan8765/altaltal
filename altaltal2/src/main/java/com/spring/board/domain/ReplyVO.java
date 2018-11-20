@@ -2,6 +2,9 @@ package com.spring.board.domain;
 
 import java.util.Date;
 
+import org.apache.ibatis.type.Alias;
+
+@Alias("reply")
 public class ReplyVO {
 	
 	private int rno;

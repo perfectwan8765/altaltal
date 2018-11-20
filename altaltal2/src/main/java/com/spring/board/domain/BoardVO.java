@@ -2,6 +2,12 @@ package com.spring.board.domain;
 
 import java.util.Date;
 
+import org.apache.ibatis.type.Alias;
+
+import lombok.Getter;
+import lombok.Setter;
+
+@Alias("board")
 public class BoardVO {
 	
 	private int bno;
@@ -11,7 +17,6 @@ public class BoardVO {
 	private int viewcnt;
 	private Date regdate;
 	private Date updatedate;
-	
 	public int getBno() {
 		return bno;
 	}
@@ -54,10 +59,10 @@ public class BoardVO {
 	public void setUpdatedate(Date updatedate) {
 		this.updatedate = updatedate;
 	}
-	
 	@Override
 	public String toString() {
 		return "BoardVO [bno=" + bno + ", uname=" + uname + ", title=" + title + ", content=" + content + ", viewcnt="
 				+ viewcnt + ", regdate=" + regdate + ", updatedate=" + updatedate + "]";
-	} 
+	}
+	
 }

@@ -101,135 +101,185 @@
 </div>
 	<script id="template" type="text/x-handlebars-template">
 		{{#each .}}
-			<div class="row" data-role={{rno}}>
+			<div class="row">
 	          	<div class="col-md-2" >
                 	<img src="http://placehold.it/80" class="img-circle img-responsive" alt="" />
                  </div>
-            	<div class="col-md-10">
-    				<input type="text" class="form-control" value="{{replytext}}">
+            	<div class="col-md-10" data-role={{rno}}>
+    				<input type="text" class="form-control" value="{{replytext}}" {{#readCheck uname }} readonly {{/readCheck}}>
 					<span>writer : {{uname}}, regdate: {{replyDate regdate}}</span>
 					{{#isWriter uname }}
-					<button class="btn btn-danger" style="float:right; margin-top:5px;">Delete reply</button>
-                    <button class="btn btn-primary" style="float:right; margin-top:5px; margin-right:5px;">Modify reply</button>			
+					<button class="btn btn-danger Dbtn" style="float:right; margin-top:5px;">Delete reply</button>
+                    <button class="btn btn-primary Mbtn" style="float:right; margin-top:5px; margin-right:5px;">Modify reply</button>			
                 	{{/isWriter}}
 				</div>
            </div>
 		{{/each}}
 	</script>
 	<script>
-		var bno = ${board.bno};
-		var replyPage = 1;
-	
-		$("#replybtn").on("click", function(){
-			var text = $("#replytext").val();
-			var uname = "${login.uname}";
-			
-			$.ajax({
-				type:'post',
-				url:'/replies/',
-				headers:{
-					"Content-Type": "application/json",
-					"X-HTTP-Method-Override": "POST"
-				},
-				dataType:'text',
-				data: JSON.stringify({bno:bno, uname:uname, replytext:text}),
-				success:function(result){
-					console.log("result:" + result);
-					if(result == 'SUCCESS'){
-						alert("등록되었습니다.");
-						getPage("/replies/" + bno + "/1");
-						$("#replytext").val("");
-					}
+	var bno = ${board.bno};
+	var replyPage = 1;
+	var user = "${login.uname}";
+
+	$("#replybtn").on("click", function(){
+		var text = $("#replytext").val();
+		var uname = "${login.uname}";
+		
+		$.ajax({
+			type:'post',
+			url:'/replies/',
+			headers:{
+				"Content-Type": "application/json",
+				"X-HTTP-Method-Override": "POST"
+			},
+			dataType:'text',
+			data: JSON.stringify({bno:bno, uname:uname, replytext:text}),
+			success:function(result){
+				console.log("result:" + result);
+				if(result == 'SUCCESS'){
+					alert("등록되었습니다.");
+					getPage("/replies/" + bno + "/1");
+					$("#replytext").val("");
 				}
-			});
-		});
-		
-		Handlebars.registerHelper("replyDate", function(timeValue){
-			var dateObj = new Date(timeValue);
-			var year = dateObj.getFullYear();
-			var month = dateObj.getMonth()+1;
-			var date = dateObj.getDate();
-			
-			return year + "/" +month + "/" + date;
-		});
-		
-		Handlebars.registerHelper("isWriter", function(writer, opts){
-			var user = "${login.uname}";
-			if (user == writer) {
-				return opts.fn(this);
-			}else {
-				return opts.inverse(this);
 			}
 		});
+	});
+	
+	Handlebars.registerHelper("replyDate", function(timeValue){
+		var dateObj = new Date(timeValue);
+		var year = dateObj.getFullYear();
+		var month = dateObj.getMonth()+1;
+		var date = dateObj.getDate();
 		
-		var printData = function(replyArr, target, templateObject){
-			
-				var template = Handlebars.compile(templateObject.html());
-				var html = template(replyArr);
-				$("#replydiv").html("");
-				target.html(html);
-		};
+		return year + "/" +month + "/" + date;
+	});
+	
+	Handlebars.registerHelper("isWriter", function(writer, opts){			
+		if (user == writer) {
+			return opts.fn(this);
+		}else {
+			return opts.inverse(this);
+		}
+	});
+	
+	Handlebars.registerHelper("readCheck", function(writer, opts){			
+		if (user == writer) {
+			return opts.inverse(this);
+		}else {
+			return opts.fn(this);			
+		}
+	});
+	
+	var printData = function(replyArr, target, templateObject){
 		
-		var printPage = function(pageMaker, target){
-				
-			var str = "";
+			var template = Handlebars.compile(templateObject.html());
+			var html = template(replyArr);
+			$("#replydiv").html("");
+			target.html(html);
+	};
+	
+	var printPage = function(pageMaker, target){
 			
-			if(pageMaker.prev){
-				str += "<li><a href='" + (pageMaker.startPage - 1) + "'> << </a></li>";
-			}
-			
-			for(var i=pageMaker.startPage; i<=pageMaker.endPage; i++){
-				var strClass = pageMaker.cri.page == i ? 'class=active' : '';
-				str += "<li " + strClass + "><a href='" + i + "'>" + i + "</a></li>";
-			}
-			
-			if(pageMaker.next){
-				str += "<li><a href='" + (pageMaker.endPage + 1) + "'> >> </a></li>";
-			}
-			
-			target.html(str);
-			
-		};
-			
-		function getPage(pageInfo){
-			$.getJSON(pageInfo, function(data){
-				printData(data.list, $("#replydiv"), $("#template"));
-				printPage(data.pageMaker, $(".pagination"));
-			});
+		var str = "";
+		
+		if(pageMaker.prev){
+			str += "<li><a href='" + (pageMaker.startPage - 1) + "'> << </a></li>";
 		}
 		
-		$(".pagination").on("click", "li a", function(event){
-			event.preventDefault();
-			replyPage = $(this).attr("href");
-			getPage("/replies/"+ bno + "/" + replyPage);
-		});
+		for(var i=pageMaker.startPage; i<=pageMaker.endPage; i++){
+			var strClass = pageMaker.cri.page == i ? 'class=active' : '';
+			str += "<li " + strClass + "><a href='" + i + "'>" + i + "</a></li>";
+		}
 		
-		$(document).ready(function(){
-			getPage("/replies/" + bno + "/1");
+		if(pageMaker.next){
+			str += "<li><a href='" + (pageMaker.endPage + 1) + "'> >> </a></li>";
+		}
+		
+		target.html(str);
+		
+	};
+		
+	function getPage(pageInfo){
+		$.getJSON(pageInfo, function(data){
+			printData(data.list, $("#replydiv"), $("#template"));
+			printPage(data.pageMaker, $(".pagination"));
 		});
-	</script>
-
-	<script>
-		var formObj = $("form[name=buttonForm]");
+	}
 	
-		$("#updateBtn").on("click", function(event){
-			formObj.attr("method", "get");
-			formObj.attr("action", "/board/update");
-			formObj.submit();				
-		});
-		
-		$("#deleteBtn").on("click", function(event){
-			formObj.attr("method", "post");
-			formObj.attr("action", "/board/delete");
-			formObj.submit();				
-		});
-		
-		$("#listBtn").on("click", function(event){
-			formObj.attr("method", "get");
-			formObj.attr("action", "/board/list");
-			formObj.submit();				
-		});
-		
+	$(".pagination").on("click", "li a", function(event){
+		event.preventDefault();
+		replyPage = $(this).attr("href");
+		getPage("/replies/"+ bno + "/" + replyPage);
+	});
+	
+	$("#replydiv").on("click", "div.row button.Dbtn",  function(){
+        var rno = $(this).parent().attr("data-role");
+        
+        $.ajax({
+        	url : "/replies/delete/" + rno,
+        	type: "post",
+        	headers:{
+        		"Content-Type": "application/json",
+				"X-HTTP-Method-Override": "POST"
+        	},
+        	dataType:"text",
+        	data: JSON.stringify({rno:rno}),
+        	success: function(result){
+        		console.log("result:" + result);
+				if(result == 'SUCCESS'){
+					alert("삭제되었습니다.");
+					getPage("/replies/" + bno + "/1");
+				}
+        	}
+        });
+ 	});
+	
+	$("#replydiv").on("click", "div.row button.Mbtn",  function(){
+        var rno = $(this).parent().attr("data-role");
+        var replytext = $(this).siblings('input').val();
+        
+        $.ajax({
+        	url : "/replies/modify/" + rno,
+        	type: "post",
+        	headers:{
+        		"Content-Type": "application/json",
+				"X-HTTP-Method-Override": "POST"
+        	},
+        	dataType:"text",
+        	data: JSON.stringify({rno:rno, replytext:replytext}),
+        	success: function(result){
+        		console.log("result:" + result);
+				if(result == 'SUCCESS'){
+					alert("수정되었습니다.");
+					getPage("/replies/" + bno + "/1");
+				}
+        	}
+        });
+ 	});
+	
+	$(document).ready(function(){
+		getPage("/replies/" + bno + "/1");
+	});
+
+	var formObj = $("form[name=buttonForm]");
+
+	$("#updateBtn").on("click", function(event){
+		formObj.attr("method", "get");
+		formObj.attr("action", "/board/update");
+		formObj.submit();				
+	});
+	
+	$("#deleteBtn").on("click", function(event){
+		formObj.attr("method", "post");
+		formObj.attr("action", "/board/delete");
+		formObj.submit();				
+	});
+	
+	$("#listBtn").on("click", function(event){
+		formObj.attr("method", "get");
+		formObj.attr("action", "/board/list");
+		formObj.submit();				
+	});
 	</script>
 
 <jsp:include page="../footer.jsp" flush="true"></jsp:include>

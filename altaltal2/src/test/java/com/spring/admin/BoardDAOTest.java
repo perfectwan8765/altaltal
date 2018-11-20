@@ -21,12 +21,12 @@ public class BoardDAOTest {
 	
 	private static Logger logger = LoggerFactory.getLogger(BoardDAOTest.class);
 	
-	@Test
+	/*@Test
 	public void testCreate() throws Exception{
 		BoardVO vo = new BoardVO();
-		vo.setTitle("새로운 글");
+		vo.setTitle("�깉濡쒖슫 湲�");
 		vo.setUname("user00");
-		vo.setContent("새로운 글 content");
+		vo.setContent("�깉濡쒖슫 湲� content");
 		dao.create(vo);
 		logger.info("insert success");
 	}
@@ -39,10 +39,10 @@ public class BoardDAOTest {
 	@Test
 	public void testUpdate() throws Exception{
 		BoardVO vo = new BoardVO();
-		vo.setTitle("수정된 글");
+		vo.setTitle("�닔�젙�맂 湲�");
 		vo.setBno(1);
-		vo.setContent("수정된 글 content");
+		vo.setContent("�닔�젙�맂 湲� content");
 		dao.update(vo);
-	}
+	}*/
 
 }

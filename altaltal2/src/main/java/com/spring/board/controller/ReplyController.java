@@ -77,4 +77,34 @@ public class ReplyController {
 		return entity;
 	}
 	
+	@RequestMapping(value="/modify/{rno}", method=RequestMethod.POST)
+	public ResponseEntity<String> modify(@PathVariable("rno") int rno, @RequestBody ReplyVO vo){
+		
+		ResponseEntity<String> entity = null;
+		
+		try {
+			service.updateReply(vo);
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+		} catch (Exception e) {
+			entity = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		
+		return entity;
+	}
+	
+	@RequestMapping(value="/delete/{rno}", method=RequestMethod.POST)
+	public ResponseEntity<String> delete(@PathVariable("rno") int rno){
+		
+		ResponseEntity<String> entity = null;
+		
+		try {
+			service.deleteReply(rno);
+			entity = new ResponseEntity<String>("SUCCESS", HttpStatus.OK);
+		} catch (Exception e) {
+			entity = new ResponseEntity<String>(e.getMessage(), HttpStatus.BAD_REQUEST);
+		}
+		
+		return entity;
+	}
+	
 }

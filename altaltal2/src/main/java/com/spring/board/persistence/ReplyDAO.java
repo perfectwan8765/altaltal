@@ -11,4 +11,6 @@ public interface ReplyDAO {
 	public List<ReplyVO> replylist(Map paramMap) throws Exception;
 	public int totalReply(int bno) throws Exception;
 	public void create(ReplyVO vo) throws Exception;
+	public void modify(ReplyVO vo) throws Exception;
+	public void delete(int rno) throws Exception;
 }
