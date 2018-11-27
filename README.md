@@ -19,7 +19,7 @@ Update </br>
 2) JSTL 활용
 3) Handlebars.js 활용
 4) Interceptor를 활용한 로그인 기능
-5) Spring-Security를 활용한 Password 
+5) Spring-Security를 활용한 Password 암호화
 
 
 
