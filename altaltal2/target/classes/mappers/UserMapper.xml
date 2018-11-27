@@ -8,10 +8,6 @@
 		select count(*) from tbl_user where email = #{email}
 	</select>
 	
-	<select id="checkPass" resultType="int">
-		select count(*) from tbl_user where email = #{email} and upw=#{upw}
-	</select>
-	
 	<select id="checkUname" resultType="int">
 		select count(*) from tbl_user where uname = #{uname}
 	</select>
@@ -30,7 +26,7 @@
 	</insert>
 	
 	<select id="login" resultType="com.spring.user.domain.UserVO">
-		select email, upw, uname, adminck, profile from tbl_user where email=#{email} and upw=#{upw}
+		select email, upw, uname, adminck, profile from tbl_user where email=#{email}
 	</select>
 	
 	<update id="changePW">

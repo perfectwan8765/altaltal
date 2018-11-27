@@ -213,4 +213,10 @@
     </div>
   </div>
 </div>
+<script>
+var msg = "${msg}";
+if(msg != null && msg != ""){
+	alert(msg);
+}
+</script>
 <!--End Large modal(회원가입) -->

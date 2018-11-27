@@ -5,7 +5,6 @@ import com.spring.user.domain.UserVO;
 
 public interface UserDAO {
 	
-	public int checkPass(UserDTO dto) throws Exception;
 	public int checkEmail(String email) throws Exception;
 	public int checkUname(String uname) throws Exception;
 	public int join(UserVO vo) throws Exception;

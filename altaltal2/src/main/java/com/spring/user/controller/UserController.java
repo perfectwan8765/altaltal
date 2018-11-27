@@ -2,7 +2,6 @@ package com.spring.user.controller;
 
 import java.util.Date;
 
-import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -10,6 +9,8 @@ import javax.servlet.http.HttpSession;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,8 +27,11 @@ import com.spring.user.service.UserService;
 @RequestMapping("/user/*")
 public class UserController {
 	
-	@Inject
+	@Autowired
 	private UserService service;
+	
+	@Autowired
+	private BCryptPasswordEncoder bcryptPasswordEncoder;
 	
 	private static Logger logger = LoggerFactory.getLogger(UserController.class);
 	
@@ -63,42 +67,39 @@ public class UserController {
 	
 	@RequestMapping(value="/login", method=RequestMethod.POST)
 	public void login(UserDTO dto, HttpSession session, HttpServletResponse response, RedirectAttributes rttr) throws Exception{
-		int check = service.checkUser(dto);
-		if(check == 1) {
-			UserVO vo = service.login(dto);
-			
-			if(vo != null) {
+		
+		UserVO vo = service.login(dto);
+		if(vo != null) {
+			if(bcryptPasswordEncoder.matches(dto.getUpw(), vo.getUpw())) {
+				
 				logger.info("new login success!");
 				session.setAttribute("login", vo);
-				
+					
 				if(dto.isUseCookie() != false) {
 					logger.info("User select AutoLogin");
 					Cookie loginCookie = new Cookie("loginCookie", session.getId());
 					loginCookie.setPath("/");
 					loginCookie.setMaxAge(60*60*24*7);
 					response.addCookie(loginCookie);
+						
+					int amount = 60*60*24*7;
+					Date sessiondate = new Date(System.currentTimeMillis() + (1000*amount));
+						
+					vo.setSessionkey(session.getId());
+					vo.setSessiondate(sessiondate);
+						
+					service.keepLogin(vo);
 				}
+				
+			}else { // password wrong
+				logger.info("Wrong Password");
+				rttr.addFlashAttribute("msg", "Wrong Password");
 			}
-			
-			if(dto.isUseCookie()) {
-				
-				int amount = 60*60*24*7;
-				Date sessiondate = new Date(System.currentTimeMillis() + (1000*amount));
-				
-				vo.setSessionkey(session.getId());
-				vo.setSessiondate(sessiondate);
-				
-				service.keepLogin(vo);				
-			}
-			
-		}else if(check == -1) {
-			logger.info("Wrong Password");
-			rttr.addFlashAttribute("msg", "Wrong Password");
 		}else {
 			logger.info("Wrong Email");
 			rttr.addFlashAttribute("msg", "Wrong Email");
 		}
-		
+
 		Object dest = session.getAttribute("dest");
 		logger.info("dest:" + dest);
 		response.sendRedirect(dest != null ? (String)dest : "/");		
@@ -107,6 +108,10 @@ public class UserController {
 	@RequestMapping(value="/join", method=RequestMethod.POST)
 	public String join(UserVO vo, RedirectAttributes rttr) throws Exception{
 		logger.info("join check: " + vo.toString());
+		
+		String encodedPw = bcryptPasswordEncoder.encode(vo.getUpw());
+		logger.info("encodedPw = " + encodedPw);
+		vo.setUpw(encodedPw);
 		
 		int check = service.join(vo);
 		if(check == 1) {

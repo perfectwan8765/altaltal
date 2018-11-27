@@ -50,10 +50,5 @@ public class UserDAOImpl implements UserDAO {
 	public UserVO checkAutoLogin(String sessionkey) throws Exception{
 		return session.selectOne(NAMESPACE+".checkAutoLogin", sessionkey);
 	}
-	
-	@Override
-	public int checkPass(UserDTO dto) throws Exception{
-		return session.selectOne(NAMESPACE+".checkPass", dto);
-	}
 
 }

@@ -1,10 +1,11 @@
 package com.spring.user.service;
 
-import javax.inject.Inject;
 import javax.mail.internet.MimeMessage;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,22 +16,12 @@ import com.spring.user.persistence.UserDAO;
 @Service
 public class UserServiceImpl implements UserService {
 
-	@Inject
+	@Autowired
 	private UserDAO dao;
 	
-	@Inject
+	@Autowired
 	private JavaMailSender mailSender;	
 	
-	@Override
-	public int checkUser(UserDTO dto) throws Exception{
-		if(dao.checkEmail(dto.getEmail()) ==1){
-			if(dao.checkPass(dto) == 1) {
-				return 1;
-			}
-			return -1;
-		}
-		return 0;
-	}
 	
 	@Transactional
 	@Override
@@ -43,8 +34,8 @@ public class UserServiceImpl implements UserService {
 		
 			String setfrom = "altaltal337@gmail.com";         
 		    String tomail  = email;     // 받는 사람 이메일
-		    String title   = "[Project Altaltal] Altaltal 홈페이지의 새로운 비밀번호를 보냅니다";     // 제목
-		    String content= "[Project Altaltal]입니다. 새로운 비밀번호를 보냅니다. 확인하시고 이 비밀번호로 로그인 해주세요. \n "
+		    String title   =  "[Project Altaltal] Altaltal 홈페이지의 새로운 비밀번호를 보냅니다";     // 제목
+		    String content=  "[Project Altaltal]입니다. 새로운 비밀번호를 보냅니다. 확인하시고 이 비밀번호로 로그인 해주세요. \n "
 		    						+ "귀하의 새로운 비밀번호는 : [ " + vo.getUpw() + " ] 입니다. \n"
 		    						+ "로그인 후 바로 비밀번호를 바꿔주세요.\n "
 		    						+ "저희 사이트를 이용해 주셔서 감사합니다. 앞으로도 많은 이용 부탁드립니다. \n"; // 내용
